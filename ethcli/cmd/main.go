@@ -17,7 +17,7 @@ import (
 func main() {
 	addressArg := flag.String("address", "", "Ethereum address to scan")
 	start := flag.Int64("start", 18000000, "Start block")
-	end := flag.Int64("end", 18000100, "End block")
+	end := flag.Int64("end", 18000100, "End block. Set to 0 to scan all blocks.")
 	rpcURL := flag.String("rpc", "https://mainnet.infura.io/v3/YOUR_KEY", "Ethereum RPC URL")
 	jsonOutput := flag.Bool("json", false, "Output JSON")
 	concurrency := flag.Int("workers", 5, "Concurrency level")
@@ -35,6 +35,14 @@ func main() {
 	defer client.Close()
 
 	ctx := context.Background()
+	if *end == 0 {
+		latest, err := client.BlockNumber(ctx)
+		if err != nil {
+			log.Fatalf("Failed to fetch latest block: %v", err)
+		}
+		*end = int64(latest)
+	}
+
 	results, err := scanner.ScanNativeTxs(ctx, client, addr, *start, *end, *concurrency)
 	if err != nil {
 		log.Fatalf("Scan error: %v", err)
