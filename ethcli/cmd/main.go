@@ -8,9 +8,11 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fatih/color"
 	"github.com/zyberg/ethcli-tx-history/internal/scanner"
 )
 
@@ -55,11 +57,23 @@ func main() {
 
 	// Output
 	if *jsonOutput {
-		json.NewEncoder(os.Stdout).Encode(results)
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		enc.Encode(results)
 		return
 	}
 	for _, tx := range results {
-		fmt.Printf("Block %d | %s | %s | From: %s -> To: %s | %s ETH\n",
-			tx.BlockNumber, tx.TxHash, tx.TxType, tx.From, tx.To, tx.Value.Text('f', 6))
+		txTypeColor := color.New(color.FgGreen)
+		if tx.TxType == "outgoing" {
+			txTypeColor = color.New(color.FgRed)
+		}
+
+		fmt.Printf("%s Block: %s\n", color.New(color.FgCyan, color.Bold).Sprint("🧱"), color.YellowString("%d", tx.BlockNumber))
+		fmt.Printf("🔗 TxHash:  %s\n", color.BlueString("%s", tx.TxHash))
+		fmt.Printf("📤 Type:    %s\n", txTypeColor.Sprintf("%s", strings.Title(tx.TxType)))
+		fmt.Printf("📥 From:    %s\n", color.HiWhiteString("%s", tx.From))
+		fmt.Printf("📤 To:      %s\n", color.HiWhiteString("%s", tx.To))
+		fmt.Printf("💰 Value:   %s %s\n", color.HiGreenString(tx.Value.Text('f', 6)), tx.Asset)
+		fmt.Println(strings.Repeat("─", 80))
 	}
 }
