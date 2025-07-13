@@ -11,4 +11,3 @@ type TxRecord struct {
 	Value       *big.Float `json:"value"`
 	Asset       string     `json:"asset"`
 }
-

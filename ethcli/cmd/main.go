@@ -55,4 +55,3 @@ func main() {
 			tx.BlockNumber, tx.TxHash, tx.TxType, tx.From, tx.To, tx.Value.Text('f', 6))
 	}
 }
-

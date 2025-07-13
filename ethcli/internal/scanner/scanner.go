@@ -89,4 +89,3 @@ func ScanNativeTxs(ctx context.Context, client *ethclient.Client, address common
 
 	return results, nil
 }
-
